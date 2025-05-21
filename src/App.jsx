@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
 
 import "./App.css";
 import { UseTheme } from "./context/ThemeContext";
+import { useDispatch, useSelector } from "react-redux";
+import { getData } from "./store/MainSlice";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -10,14 +11,27 @@ function App() {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState([]);
 
+  const data2 = useSelector((state) => state?.main?.data);
+
+  console.log("data22222", data2);
+
   const inputRef = useRef(null);
+
+  const dispatch = useDispatch();
 
   const { darkMode, toggleTheme } = UseTheme();
   console.log("darkMode", darkMode);
   const fetchUserData = async () => {
-    const res = await axios.get("https://jsonplaceholder.typicode.com/users");
-    setData(res?.data);
-    setFilter(res?.data);
+    await dispatch(getData())
+      .unwrap()
+      .then((res) => {
+        console.log(res);
+        setData(res);
+        setFilter(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   useEffect(() => {
